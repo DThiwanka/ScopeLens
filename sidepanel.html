@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ScopeLens Side Panel</title>
+  <link rel="stylesheet" href="sidepanel.css">
+</head>
+<body class="sp-body">
+  <header class="sp-header">
+    <div class="sp-brand-row">
+      <div class="sp-logo">SL</div>
+      <div class="sp-brand-title">
+        <strong>ScopeLens</strong>
+        <span class="sp-sub">Live Inspector</span>
+      </div>
+      <div class="sp-header-controls">
+        <button id="sp-refresh-btn" class="sp-icon-btn" title="Re-inspect Active Tab">↻</button>
+        <button id="sp-dashboard-btn" class="sp-icon-btn" title="Open Full Dashboard">↗</button>
+      </div>
+    </div>
+
+    <!-- Active Target info -->
+    <div class="sp-target-card">
+      <div class="sp-target-eyebrow">
+        <span>ACTIVE TARGET</span>
+        <span id="sp-protocol-pill" class="sp-pill sp-pill-neutral">HTTPS</span>
+      </div>
+      <div id="sp-target-title" class="sp-target-title">Detecting active tab…</div>
+      <div id="sp-target-url" class="sp-target-url">Waiting for connection…</div>
+    </div>
+  </header>
+
+  <!-- Live Status Bar -->
+  <div class="sp-metric-bar">
+    <div class="sp-metric-item">
+      <div class="sp-metric-label">SECURITY</div>
+      <div id="sp-sec-grade" class="sp-metric-val sp-grade-na">—</div>
+    </div>
+    <div class="sp-metric-item">
+      <div class="sp-metric-label">FINDINGS</div>
+      <div id="sp-findings-count" class="sp-metric-val">0</div>
+    </div>
+    <div class="sp-metric-item">
+      <div class="sp-metric-label">TECH</div>
+      <div id="sp-tech-count" class="sp-metric-val">0</div>
+    </div>
+    <div class="sp-metric-item">
+      <div class="sp-metric-label">STORAGE</div>
+      <div id="sp-storage-count" class="sp-metric-val">0</div>
+    </div>
+  </div>
+
+  <!-- Primary Action Grid -->
+  <div class="sp-action-grid">
+    <button id="sp-inspect-btn" class="sp-btn sp-btn-primary">
+      <span>⚡ Inspect Page</span>
+    </button>
+    <button id="sp-dns-btn" class="sp-btn sp-btn-secondary">
+      <span>🌐 DNS Lookup</span>
+    </button>
+    <button id="sp-capture-btn" class="sp-btn sp-btn-secondary">
+      <span>📡 IP Capture</span>
+    </button>
+  </div>
+
+  <!-- Tabs Navigation -->
+  <nav class="sp-nav">
+    <button class="sp-nav-btn active" data-pane="pane-findings">Findings</button>
+    <button class="sp-nav-btn" data-pane="pane-security">Security</button>
+    <button class="sp-nav-btn" data-pane="pane-tech">Tech Stack</button>
+    <button class="sp-nav-btn" data-pane="pane-storage">Tokens & Storage</button>
+    <button class="sp-nav-btn" data-pane="pane-network">Network</button>
+  </nav>
+
+  <!-- Main Scrollable Content -->
+  <main class="sp-content">
+    <!-- 1. FINDINGS PANE -->
+    <section id="pane-findings" class="sp-pane active">
+      <div id="sp-findings-container" class="sp-list">
+        <div class="sp-placeholder">
+          Click <strong>⚡ Inspect Page</strong> to analyze security posture and detect vulnerabilities.
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. SECURITY PANE -->
+    <section id="pane-security" class="sp-pane">
+      <div class="sp-section-heading">HTTP Security Headers</div>
+      <div id="sp-headers-list" class="sp-list">
+        <div class="sp-placeholder">Inspect page to evaluate OWASP security headers.</div>
+      </div>
+
+      <div class="sp-section-heading" style="margin-top: 14px;">Cookie Security Hygiene</div>
+      <div id="sp-cookies-list" class="sp-list">
+        <div class="sp-placeholder">No cookies evaluated yet.</div>
+      </div>
+    </section>
+
+    <!-- 3. TECH STACK PANE -->
+    <section id="pane-tech" class="sp-pane">
+      <div class="sp-section-heading">Detected Technologies</div>
+      <div id="sp-tech-grid" class="sp-tech-chips">
+        <div class="sp-placeholder">Inspect page to fingerprint client technologies.</div>
+      </div>
+    </section>
+
+    <!-- 4. TOKENS & STORAGE PANE -->
+    <section id="pane-storage" class="sp-pane">
+      <div class="sp-section-heading">Detected Tokens & JWTs</div>
+      <div id="sp-tokens-list" class="sp-list">
+        <div class="sp-placeholder">No authorization tokens detected.</div>
+      </div>
+
+      <div class="sp-section-heading" style="margin-top: 14px;">Storage Keys</div>
+      <div id="sp-storage-list" class="sp-list">
+        <div class="sp-placeholder">Local/Session storage keys will appear here.</div>
+      </div>
+    </section>
+
+    <!-- 5. NETWORK PANE -->
+    <section id="pane-network" class="sp-pane">
+      <div class="sp-section-heading">Observed Remote IPs & Ports</div>
+      <div id="sp-network-list" class="sp-list">
+        <div class="sp-placeholder">Click <strong>📡 IP Capture</strong> or inspect page to observe network hosts.</div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="sp-footer">
+    <span>ScopeLens v2.0.0 · Local-First</span>
+    <button id="sp-launch-dash-btn" class="sp-text-link">Full Console ↗</button>
+  </footer>
+
+  <script type="module" src="sidepanel.js"></script>
+</body>
+</html>

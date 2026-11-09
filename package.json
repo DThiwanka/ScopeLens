@@ -1,0 +1,23 @@
+{
+  "name": "scopelens-extension",
+  "version": "2.0.0",
+  "description": "ScopeLens — Professional Web Security, Network Intelligence, and Site Inspection Platform",
+  "type": "module",
+  "scripts": {
+    "test": "node tests/runner.js",
+    "manifest:standard": "node scripts/switch-manifest.js standard",
+    "manifest:deep": "node scripts/switch-manifest.js deep-capture",
+    "package": "node scripts/package-release.js"
+  },
+  "keywords": [
+    "security",
+    "network-intelligence",
+    "site-inspector",
+    "jwt",
+    "dnssec",
+    "chrome-extension",
+    "devtools"
+  ],
+  "author": "ScopeLens Security Team",
+  "license": "Apache-2.0"
+}

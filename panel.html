@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ScopeLens Network Inspector</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="panel-body">
+  <header class="topbar panel-topbar">
+    <div class="brand-row">
+      <div class="brand-mark">SL</div>
+      <div>
+        <div class="brand-name">ScopeLens Network Inspector</div>
+        <div id="origin" class="brand-sub">Connecting to inspected page…</div>
+      </div>
+    </div>
+
+    <div class="panel-controls">
+      <div class="search-wrap">
+        <input type="text" id="filter-input" placeholder="Filter requests by URL or status…" class="input-search">
+      </div>
+      <div class="filter-group">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="fetch">Fetch/XHR</button>
+        <button class="filter-btn" data-filter="script">JS</button>
+        <button class="filter-btn" data-filter="stylesheet">CSS</button>
+        <button class="filter-btn" data-filter="document">Doc</button>
+        <button class="filter-btn" data-filter="image">Media</button>
+      </div>
+      <div class="btn-group">
+        <button id="export-btn" class="secondary btn-sm" title="Export captured requests to JSON">Export JSON</button>
+        <button id="clear-btn" class="secondary btn-sm" title="Clear captured requests">Clear</button>
+      </div>
+      <span id="count" class="pill">0 requests</span>
+    </div>
+  </header>
+
+  <main class="panel-main">
+    <div class="notice">
+      <strong>Mode Notice:</strong> DevTools Standard Network Mode active. Chromium restricts concurrent <code>chrome.debugger</code> CDP sessions while DevTools is open. Captured requests, headers, and response previews are analyzed locally; secrets and tokens are redacted.
+    </div>
+    <div id="requests" class="network-list">
+      <div class="empty">Reload the inspected page with DevTools open to capture same-origin network traffic.</div>
+    </div>
+  </main>
+
+  <script src="panel.js"></script>
+</body>
+</html>

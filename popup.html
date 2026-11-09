@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ScopeLens</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="popup-body">
+  <header class="topbar">
+    <div class="brand-row">
+      <div class="brand-mark">SL</div>
+      <div>
+        <div class="brand-name">ScopeLens</div>
+        <div class="brand-sub">Site Inspector & Security Auditor</div>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <span id="page-state" class="pill">Ready</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="site-card">
+      <div class="site-card-top">
+        <span class="eyebrow">ACTIVE TARGET</span>
+        <span id="site-security-badge" class="badge-mini badge-neutral">HTTP/S</span>
+      </div>
+      <div id="site-title" class="site-title">No website selected</div>
+      <div id="site-url" class="site-url">Open a website tab, then reopen ScopeLens.</div>
+    </section>
+
+    <section class="action-grid">
+      <button id="inspect-btn" class="primary">
+        <span class="btn-icon">⚡</span> Inspect Site
+      </button>
+      <button id="dns-btn" class="secondary">
+        <span class="btn-icon">🌐</span> Lookup DNS
+      </button>
+      <button id="capture-btn" class="secondary">
+        <span class="btn-icon">📡</span> Start IP Capture
+      </button>
+      <button id="export-report-btn" class="secondary" title="Export inspection results to JSON & Markdown">
+        <span class="btn-icon">📋</span> Export Report
+      </button>
+    </section>
+
+    <div class="launch-bar" style="display: flex; gap: 8px;">
+      <button id="open-dashboard-btn" class="dashboard-launch-btn" style="flex: 2;">
+        <span class="btn-icon">🚀</span> Launch Full Dashboard
+      </button>
+      <button id="open-sidepanel-btn" class="dashboard-launch-btn" style="flex: 1; background: #0f172a; border-color: #334155;" title="Keep ScopeLens open persistently in Chrome Side Panel">
+        <span class="btn-icon">📑</span> Side Panel
+      </button>
+    </div>
+
+    <!-- Tab navigation -->
+    <nav class="nav-tabs">
+      <button class="tab-btn active" data-tab="tab-overview">Overview</button>
+      <button class="tab-btn" data-tab="tab-security">Security <span id="sec-count-badge" class="tab-badge hidden">!</span></button>
+      <button class="tab-btn" data-tab="tab-risks">Risks & Recon <span id="risk-count-badge" class="tab-badge hidden">0</span></button>
+      <button class="tab-btn" data-tab="tab-storage">Storage & JWTs</button>
+      <button class="tab-btn" data-tab="tab-network">Endpoints & TLS</button>
+      <button class="tab-btn" data-tab="tab-dns">DNS</button>
+    </nav>
+
+    <!-- Quick search filter -->
+    <div class="search-bar-wrap">
+      <input type="text" id="tab-search-input" placeholder="Search keys, headers, technologies, or records…" class="search-input">
+      <button id="clear-search-btn" class="clear-search-btn hidden">&times;</button>
+    </div>
+
+    <!-- OVERVIEW TAB -->
+    <section id="tab-overview" class="tab-pane active">
+      <div class="notice">
+        <strong>Local & Privacy-First:</strong> Inspection executes on the active tab and its exact origin. Credentials and JWTs are decoded locally; secrets are redacted.
+      </div>
+
+      <!-- Security score card -->
+      <div id="security-score-card" class="panel hidden">
+        <div class="score-card-header">
+          <div>
+            <div class="score-label">SECURITY POSTURE GRADE</div>
+            <div id="security-score-sub" class="score-sub">Based on HTTP headers, cookie hygiene & context</div>
+          </div>
+          <div id="security-grade-badge" class="grade-badge grade-b">B</div>
+        </div>
+        <div id="security-score-summary" class="score-summary-list"></div>
+      </div>
+
+      <!-- Tech Stack Detection -->
+      <div id="tech-stack-panel" class="panel hidden">
+        <div class="panel-heading">
+          <h2>Detected Technologies</h2>
+          <span id="tech-count" class="muted">0 detected</span>
+        </div>
+        <div id="tech-stack-grid" class="tech-grid"></div>
+      </div>
+
+      <!-- Quick Metrics Grid -->
+      <div id="summary-panel" class="panel hidden">
+        <div class="panel-heading">
+          <h2>Page Snapshot</h2>
+          <span id="snapshot-origin" class="muted"></span>
+        </div>
+        <div id="snapshot-grid" class="stat-grid"></div>
+        <div id="snapshot-details" class="detail-list"></div>
+      </div>
+
+      <div id="overview-empty" class="empty panel">
+        Click <strong>Inspect Site</strong> above to analyze security headers, tech stack, web storage, and tokens.
+      </div>
+    </section>
+
+    <!-- SECURITY TAB -->
+    <section id="tab-security" class="tab-pane hidden">
+      <div class="panel">
+        <div class="panel-heading">
+          <h2>HTTP Security Headers Audit</h2>
+          <span id="headers-count" class="muted">Live response audit</span>
+        </div>
+        <p class="small muted">Evaluates defensive HTTP headers against current OWASP security best practices.</p>
+        <div id="security-checklist" class="checklist-wrap">
+          <div class="empty">Click <strong>Inspect Site</strong> to audit security headers.</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-heading">
+          <h2>Content Security Policy (CSP) Analysis</h2>
+          <span id="csp-status" class="muted">Not evaluated</span>
+        </div>
+        <div id="csp-details" class="detail-list">
+          <div class="empty">No CSP inspected yet.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RISKS & RECON TAB -->
+    <section id="tab-risks" class="tab-pane hidden">
+      <div class="panel">
+        <div class="panel-heading">
+          <h2>DOM Security & Supply Chain Vulnerabilities</h2>
+          <span id="risks-count-text" class="muted">Awaiting inspection</span>
+        </div>
+        <p class="small muted">
+          Scans for Mixed Content, Reverse Tabnabbing (target=_blank without rel=noopener), Subresource Integrity (SRI) on external scripts, and exposed API keys.
+        </p>
+        <div id="risks-results" class="checklist-wrap">
+          <div class="empty">Click <strong>Inspect Site</strong> to scan for DOM risks and exposed keys.</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-heading">
+          <h2>Reconnaissance & Policy Discovery</h2>
+          <button id="probe-recon-btn" class="btn-xs">Check Robots.txt & Security.txt</button>
+        </div>
+        <p class="small muted">
+          Inspects RFC 9116 security policy disclosures and robots.txt disallowed paths (disclosing internal or staging endpoints).
+        </p>
+        <div id="recon-results">
+          <div class="empty">Click <strong>Check Robots.txt & Security.txt</strong> to probe endpoints on this origin.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STORAGE & JWTS TAB -->
+    <section id="tab-storage" class="tab-pane hidden">
+      <div class="panel">
+        <div class="panel-heading">
+          <h2>Web Storage & Deep Token Inspector</h2>
+          <div class="storage-tools-row">
+            <span id="storage-usage-pill" class="pill">0 KB used</span>
+            <button id="export-storage-btn" class="btn-xs" title="Export origin storage to JSON">Export Storage</button>
+            <button id="clear-storage-btn" class="btn-xs btn-danger" title="Clear localStorage & sessionStorage for this origin">Clear Storage</button>
+          </div>
+        </div>
+        <div id="storage-results">
+          <div class="empty">Click <strong>Inspect Site</strong> to inspect localStorage, sessionStorage, and cookies.</div>
+        </div>
+        <button id="cache-preview-btn" class="text-button hidden">Preview readable CacheStorage text</button>
+        <div id="cache-previews"></div>
+      </div>
+    </section>
+
+    <!-- ENDPOINTS & TLS TAB -->
+    <section id="tab-network" class="tab-pane hidden">
+      <div class="panel">
+        <div class="panel-heading">
+          <h2>Observed Remote Endpoints & TLS</h2>
+          <span id="capture-state" class="muted">Not capturing</span>
+        </div>
+        <p class="small muted">
+          Chrome DevTools Protocol captures actual remote IPs, ports, and TLS handshake metadata observed during browser requests. This is not a port scan.
+        </p>
+        <div id="tls-card" class="tls-summary-card hidden"></div>
+        <div id="network-results">
+          <div class="empty">Click <strong>Start IP Capture</strong>, then reload or use the page to record remote endpoints.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DNS TAB -->
+    <section id="tab-dns" class="tab-pane hidden">
+      <div class="panel">
+        <div class="panel-heading">
+          <h2>DNS-over-HTTPS Records</h2>
+          <span id="dns-host" class="muted"></span>
+        </div>
+        <div id="dnssec-badge-container"></div>
+        <div id="dns-results">
+          <div class="empty">Click <strong>Lookup DNS</strong> to query DNS records via Cloudflare DoH.</div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer-note">
+      Findings stay strictly in this browser session. Nothing is uploaded by ScopeLens.
+    </footer>
+  </main>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="toast hidden">Copied to clipboard!</div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

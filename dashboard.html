@@ -1,0 +1,574 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ScopeLens — Web Security & Network Intelligence Platform</title>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body class="dashboard-body">
+  <div class="app-layout">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-badge">SL</div>
+        <div class="brand-info">
+          <span class="brand-title">ScopeLens</span>
+          <span class="brand-tag">Security & Intel Platform</span>
+        </div>
+      </div>
+
+      <div class="target-card">
+        <div class="target-eyebrow">ACTIVE TARGET</div>
+        <select id="target-tab-select" class="target-select hidden" title="Switch target tab"></select>
+        <div id="target-domain" class="target-domain">Connecting to tab…</div>
+        <div id="target-url" class="target-url muted">—</div>
+        <div class="target-badges">
+          <span id="target-protocol-badge" class="badge-mini badge-neutral">HTTP/S</span>
+          <span id="capture-status-badge" class="badge-mini badge-neutral">Passive</span>
+        </div>
+      </div>
+
+      <div class="sidebar-actions">
+        <button id="btn-run-audit" class="btn btn-primary btn-block">
+          <span class="btn-icon">⚡</span> Run Full Audit
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">INTELLIGENCE & AUDITING</div>
+        <button class="nav-item active" data-view="view-overview">
+          <span class="nav-icon">📊</span> Overview Dashboard
+        </button>
+        <button class="nav-item" data-view="view-security">
+          <span class="nav-icon">🛡️</span> Security Auditor <span id="nav-badge-sec" class="nav-badge hidden">0</span>
+        </button>
+        <button class="nav-item" data-view="view-ip">
+          <span class="nav-icon">🌐</span> IP Intelligence
+        </button>
+        <button class="nav-item" data-view="view-dns">
+          <span class="nav-icon">📡</span> DNS & Email Security
+        </button>
+        <button class="nav-item" data-view="view-network">
+          <span class="nav-icon">⚡</span> Network Waterfall
+        </button>
+        <button class="nav-item" data-view="view-tokens">
+          <span class="nav-icon">🔑</span> Token & Auth Intel
+        </button>
+        <button class="nav-item" data-view="view-storage">
+          <span class="nav-icon">💾</span> Browser Storage
+        </button>
+        <button class="nav-item" data-view="view-cookies">
+          <span class="nav-icon">🍪</span> Cookie Security
+        </button>
+        <button class="nav-item" data-view="view-cache">
+          <span class="nav-icon">⚡</span> Cache & Workers
+        </button>
+        <button class="nav-item" data-view="view-api">
+          <span class="nav-icon">🔌</span> API Discovery
+        </button>
+        <button class="nav-item" data-view="view-tech">
+          <span class="nav-icon">💻</span> Tech Fingerprints
+        </button>
+        <button class="nav-item" data-view="view-trackers">
+          <span class="nav-icon">👁️</span> Third-Party Trackers
+        </button>
+        <button class="nav-item" data-view="view-performance">
+          <span class="nav-icon">⏱️</span> Performance Metrics
+        </button>
+
+        <div class="nav-section-title">MANAGEMENT & EXPORTS</div>
+        <button class="nav-item" data-view="view-snapshots">
+          <span class="nav-icon">📸</span> Snapshots & Diff
+        </button>
+        <button class="nav-item" data-view="view-reports">
+          <span class="nav-icon">📑</span> Report & Export Center
+        </button>
+        <button class="nav-item" data-view="view-settings">
+          <span class="nav-icon">⚙️</span> Settings & Scope
+        </button>
+      </nav>
+    </aside>
+
+    <!-- Main Workspace -->
+    <main class="main-content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <h1 id="view-title">Overview Dashboard</h1>
+          <span id="view-subtitle" class="muted">Live security posture and site metrics</span>
+        </div>
+        <div class="topbar-right">
+          <div class="global-search-wrap">
+            <input type="text" id="global-search" class="input-search" placeholder="Search findings, domains, tokens, or headers…">
+          </div>
+          <button id="btn-export-quick" class="btn btn-secondary btn-sm">
+            <span class="btn-icon">📥</span> Export JSON
+          </button>
+        </div>
+      </header>
+
+      <div class="content-scroll">
+        <!-- 1. OVERVIEW VIEW -->
+        <section id="view-overview" class="view-pane active">
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-label">SECURITY GRADE</div>
+              <div id="kpi-grade" class="kpi-value kpi-grade">—</div>
+              <div id="kpi-grade-sub" class="kpi-sub">Awaiting inspection</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">TOTAL FINDINGS</div>
+              <div id="kpi-findings" class="kpi-value">0</div>
+              <div id="kpi-findings-sub" class="kpi-sub">0 critical · 0 high</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">DISTINCT ENDPOINTS</div>
+              <div id="kpi-endpoints" class="kpi-value">0</div>
+              <div id="kpi-endpoints-sub" class="kpi-sub">IPv4 & IPv6 hosts</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">THIRD PARTIES</div>
+              <div id="kpi-third-parties" class="kpi-value">0</div>
+              <div id="kpi-third-parties-sub" class="kpi-sub">Trackers & CDNs</div>
+            </div>
+          </div>
+
+          <div class="dashboard-grid">
+            <div class="panel">
+              <div class="panel-header">
+                <h2>Top Security Findings</h2>
+                <button class="text-link" data-switch-view="view-security">View all findings →</button>
+              </div>
+              <div id="overview-findings-list" class="findings-stack">
+                <div class="empty">Click <strong>Run Full Audit</strong> to perform a security posture assessment.</div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <h2>Identified Technologies</h2>
+                <button class="text-link" data-switch-view="view-tech">All fingerprints →</button>
+              </div>
+              <div id="overview-tech-grid" class="tech-badge-grid">
+                <div class="empty">No technologies fingerprinted yet.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="dashboard-grid">
+            <div class="panel">
+              <div class="panel-header">
+                <h2>Observed Connections & Ports</h2>
+                <span id="overview-ports-summary" class="muted">No ports observed</span>
+              </div>
+              <div id="overview-endpoints-table"></div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <h2>External Dependencies Breakdown</h2>
+                <span id="overview-trackers-summary" class="muted">0 third parties</span>
+              </div>
+              <div id="overview-trackers-chart"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. SECURITY AUDITOR VIEW -->
+        <section id="view-security" class="view-pane hidden">
+          <div class="filter-toolbar">
+            <div class="filter-pills">
+              <button class="pill-btn active" data-sec-filter="all">All Findings</button>
+              <button class="pill-btn" data-sec-filter="CRITICAL">Critical</button>
+              <button class="pill-btn" data-sec-filter="HIGH">High</button>
+              <button class="pill-btn" data-sec-filter="MEDIUM">Medium</button>
+              <button class="pill-btn" data-sec-filter="LOW">Low</button>
+              <button class="pill-btn" data-sec-filter="INFORMATIONAL">Info</button>
+            </div>
+            <span id="sec-findings-count" class="muted">0 findings</span>
+          </div>
+
+          <div id="security-findings-container" class="findings-stack">
+            <div class="empty">No security findings recorded. Click Run Full Audit above.</div>
+          </div>
+
+          <div class="panel" style="margin-top: 20px;">
+            <div class="panel-header">
+              <h2>Content-Security-Policy (CSP) Directives Breakdown</h2>
+              <span id="sec-csp-status" class="muted">Not configured</span>
+            </div>
+            <div id="sec-csp-parsed"></div>
+          </div>
+        </section>
+
+        <!-- 3. IP INTELLIGENCE VIEW -->
+        <section id="view-ip" class="view-pane hidden">
+          <div class="panel">
+            <div class="panel-header">
+              <h2>Remote IP Endpoints & Routing Intelligence</h2>
+              <span id="ip-count-badge" class="muted">0 IPs</span>
+            </div>
+            <p class="small muted">
+              Addresses and ports actually connected to by the browser for this page session. Classifies scopes (Public, RFC 1918 Private, Loopback, Link-Local) and flags duplicate connections.
+            </p>
+            <div id="ip-endpoints-table-wrap"></div>
+          </div>
+        </section>
+
+        <!-- 4. DNS VIEW -->
+        <section id="view-dns" class="view-pane hidden">
+          <div class="action-bar-panel">
+            <div>
+              <div class="panel-title">DNS-over-HTTPS & Email Authentication Inspection</div>
+              <div class="muted small">Queries Cloudflare DoH resolver for authenticated records and parses SPF/DMARC email defenses.</div>
+            </div>
+            <button id="btn-trigger-dns" class="btn btn-primary btn-sm">Refresh DNS Lookup</button>
+          </div>
+
+          <div id="dnssec-status-banner"></div>
+
+          <div class="dashboard-grid">
+            <div class="panel">
+              <div class="panel-header">
+                <h2>SPF (Sender Policy Framework)</h2>
+                <span id="spf-policy-pill" class="badge-mini badge-neutral">Not queried</span>
+              </div>
+              <div id="spf-details-box" class="code-box">Awaiting query…</div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <h2>DMARC Configuration</h2>
+                <span id="dmarc-policy-pill" class="badge-mini badge-neutral">Not queried</span>
+              </div>
+              <div id="dmarc-details-box" class="code-box">Awaiting query…</div>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-top: 15px;">
+            <div class="panel-header">
+              <h2>Resolved DNS Records</h2>
+              <span id="dns-record-count" class="muted">0 records</span>
+            </div>
+            <div id="dns-records-container"></div>
+          </div>
+        </section>
+
+        <!-- 5. NETWORK WATERFALL VIEW -->
+        <section id="view-network" class="view-pane hidden">
+          <div class="filter-toolbar">
+            <div class="filter-pills">
+              <button class="pill-btn active" data-net-filter="all">All</button>
+              <button class="pill-btn" data-net-filter="fetch">Fetch/XHR</button>
+              <button class="pill-btn" data-net-filter="script">JS</button>
+              <button class="pill-btn" data-net-filter="stylesheet">CSS</button>
+              <button class="pill-btn" data-net-filter="document">Doc</button>
+              <button class="pill-btn" data-net-filter="image">Media</button>
+            </div>
+            <div class="btn-group">
+              <button id="btn-toggle-capture" class="btn btn-secondary btn-sm">Start CDP Capture</button>
+              <button id="btn-clear-network" class="btn btn-secondary btn-sm">Clear</button>
+            </div>
+          </div>
+
+          <div id="network-waterfall-container" class="network-stream">
+            <div class="empty">Reload the page or click Start CDP Capture to monitor same-origin and third-party requests.</div>
+          </div>
+        </section>
+
+        <!-- 6. TOKEN & AUTH VIEW -->
+        <section id="view-tokens" class="view-pane hidden">
+          <div class="panel">
+            <div class="panel-header">
+              <h2>Detected Tokens & Session Identifiers</h2>
+              <span id="tokens-count-badge" class="muted">0 tokens</span>
+            </div>
+            <p class="small muted">
+              Decodes JWT headers and payloads locally. Highlights algorithms, verifies expiration timestamps, and flags insecure parameters (e.g. alg: none). Sensitive values are masked by default.
+            </p>
+            <div id="tokens-list-container">
+              <div class="empty">No token-like values identified in accessible web storage or cookies.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 7. BROWSER STORAGE VIEW -->
+        <section id="view-storage" class="view-pane hidden">
+          <div class="dashboard-grid">
+            <div class="panel">
+              <div class="panel-header">
+                <h2>Local Storage</h2>
+                <span id="storage-local-count" class="muted">0 keys</span>
+              </div>
+              <div id="storage-local-table"></div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <h2>Session Storage</h2>
+                <span id="storage-session-count" class="muted">0 keys</span>
+              </div>
+              <div id="storage-session-table"></div>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-top: 15px;">
+            <div class="panel-header">
+              <h2>IndexedDB Schema</h2>
+              <span id="storage-idb-count" class="muted">0 databases</span>
+            </div>
+            <div id="storage-idb-container"></div>
+          </div>
+        </section>
+
+        <!-- 8. COOKIES VIEW -->
+        <section id="view-cookies" class="view-pane hidden">
+          <div class="panel">
+            <div class="panel-header">
+              <h2>Cookie Hygiene & Security Flags</h2>
+              <span id="cookies-count-badge" class="muted">0 cookies</span>
+            </div>
+            <p class="small muted">
+              Audits HttpOnly, Secure, SameSite, and scope attributes. Highlights sensitive session tokens exposed to client scripts without HttpOnly.
+            </p>
+            <div id="cookies-table-wrap"></div>
+          </div>
+        </section>
+
+        <!-- 9. CACHE & WORKERS VIEW -->
+        <section id="view-cache" class="view-pane hidden">
+          <div class="dashboard-grid">
+            <div class="panel">
+              <div class="panel-header">
+                <h2>Service Worker Registrations</h2>
+                <span id="cache-sw-count" class="muted">0 workers</span>
+              </div>
+              <div id="cache-sw-container"></div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <h2>Storage Quota Utilization</h2>
+                <span id="cache-quota-badge" class="muted">Estimate</span>
+              </div>
+              <div id="cache-quota-container"></div>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-top: 15px;">
+            <div class="panel-header">
+              <h2>CacheStorage Buckets</h2>
+              <span id="cache-buckets-count" class="muted">0 buckets</span>
+            </div>
+            <div id="cache-buckets-container"></div>
+          </div>
+        </section>
+
+        <!-- 10. API EXPLORER VIEW -->
+        <section id="view-api" class="view-pane hidden">
+          <div class="panel">
+            <div class="panel-header">
+              <h2>Discovered API Endpoints & Routes</h2>
+              <span id="api-endpoints-count" class="muted">0 endpoints</span>
+            </div>
+            <p class="small muted">
+              Automatically abstracts REST routes (e.g. /users/{id}), identifies GraphQL queries, maps status distributions, and highlights authenticated endpoints.
+            </p>
+            <div id="api-inventory-table"></div>
+          </div>
+        </section>
+
+        <!-- 11. TECH FINGERPRINTS VIEW -->
+        <section id="view-tech" class="view-pane hidden">
+          <div class="panel">
+            <div class="panel-header">
+              <h2>Technology Fingerprint Engine</h2>
+              <span id="tech-total-badge" class="muted">0 detected</span>
+            </div>
+            <div id="tech-full-table"></div>
+          </div>
+        </section>
+
+        <!-- 12. TRACKERS VIEW -->
+        <section id="view-trackers" class="view-pane hidden">
+          <div class="panel">
+            <div class="panel-header">
+              <h2>Third-Party Dependencies & Tracking Infrastructure</h2>
+              <span id="trackers-total-badge" class="muted">0 domains</span>
+            </div>
+            <div class="tracker-graph-box" style="margin-bottom: 16px; background: #080c14; border: 1px solid var(--border); border-radius: 8px; padding: 10px; text-align: center;">
+              <div class="small muted" style="margin-bottom: 8px; text-align: left; font-weight: 600;">INTERACTIVE DEPENDENCY GRAPH</div>
+              <svg id="tracker-graph-svg" style="width: 100%; height: 260px;"></svg>
+            </div>
+            <div id="trackers-full-table"></div>
+          </div>
+        </section>
+
+        <!-- 13. PERFORMANCE VIEW -->
+        <section id="view-performance" class="view-pane hidden">
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-label">TOTAL TRANSFERRED</div>
+              <div id="perf-kpi-bytes" class="kpi-value">—</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">CACHE UTILIZATION</div>
+              <div id="perf-kpi-cache" class="kpi-value">—</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">THIRD-PARTY BYTES</div>
+              <div id="perf-kpi-third-bytes" class="kpi-value">—</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">FAILED REQUESTS</div>
+              <div id="perf-kpi-failed" class="kpi-value">—</div>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-top: 15px;">
+            <div class="panel-header">
+              <h2>Slowest Observed Requests</h2>
+              <span class="muted">Ranked by latency</span>
+            </div>
+            <div id="perf-slow-table"></div>
+          </div>
+        </section>
+
+        <!-- 14. SNAPSHOTS VIEW -->
+        <section id="view-snapshots" class="view-pane hidden">
+          <div class="action-bar-panel">
+            <div>
+              <div class="panel-title">Inspection Snapshots & Delta Comparison</div>
+              <div class="muted small">Save point-in-time snapshots of the site to identify new endpoints, altered headers, or emerging findings.</div>
+            </div>
+            <button id="btn-create-snapshot" class="btn btn-primary btn-sm">Capture New Snapshot</button>
+          </div>
+
+          <div class="dashboard-grid">
+            <div class="panel">
+              <div class="panel-header">
+                <h2>Saved Snapshots</h2>
+                <span id="snapshots-count" class="muted">0 saved</span>
+              </div>
+              <div id="snapshots-list"></div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <h2>Snapshot Delta Comparison</h2>
+                <button id="btn-run-compare" class="btn btn-secondary btn-xs">Compare Selected</button>
+              </div>
+              <div id="snapshot-diff-output" class="code-box">Select two snapshots to calculate differential changes.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 15. REPORTS & EXPORTS VIEW -->
+        <section id="view-reports" class="view-pane hidden">
+          <div class="panel">
+            <div class="panel-header">
+              <h2>Audit Report Generation & Data Export</h2>
+            </div>
+            <p class="small muted">
+              Export comprehensive, sanitized reports with credentials, bearer tokens, and sensitive headers automatically redacted.
+            </p>
+
+            <div class="export-cards-grid">
+              <div class="export-card">
+                <h3>Standalone Interactive HTML Report</h3>
+                <p>Self-contained HTML file with embedded dark styling, complete findings, and executive summary.</p>
+                <button id="btn-export-html" class="btn btn-primary btn-sm">Generate HTML Report</button>
+              </div>
+              <div class="export-card">
+                <h3>Structured JSON Audit File</h3>
+                <p>Full machine-readable JSON object containing findings, technology list, DNS, endpoints, and storage summary.</p>
+                <button id="btn-export-json-full" class="btn btn-secondary btn-sm">Download JSON</button>
+              </div>
+              <div class="export-card">
+                <h3>Findings CSV Export</h3>
+                <p>Tabular spreadsheet export of all security findings with severity, descriptions, and remediations.</p>
+                <button id="btn-export-csv" class="btn btn-secondary btn-sm">Download CSV</button>
+              </div>
+              <div class="export-card">
+                <h3>HTTP Archive (HAR 1.2)</h3>
+                <p>Standard HAR network archive of captured requests and timing with credentials masked for DevTools/Wireshark.</p>
+                <button id="btn-export-har" class="btn btn-secondary btn-sm">Download HAR</button>
+              </div>
+              <div class="export-card">
+                <h3>Copy Executive Markdown</h3>
+                <p>Copies a formatted Markdown executive summary directly to clipboard for PRs or issue trackers.</p>
+                <button id="btn-copy-markdown" class="btn btn-secondary btn-sm">Copy to Clipboard</button>
+              </div>
+              <div class="export-card">
+                <h3>CycloneDX Software Bill of Materials (SBOM)</h3>
+                <p>Standard CycloneDX v1.4 JSON SBOM enumerating client-side third-party JavaScript libraries and dependencies.</p>
+                <button id="btn-export-cyclonedx" class="btn btn-secondary btn-sm">Download CycloneDX</button>
+              </div>
+              <div class="export-card">
+                <h3>SPDX 2.3 Dependency Manifest</h3>
+                <p>Linux Foundation SPDX 2.3 machine-readable JSON specification for software package tracking and compliance.</p>
+                <button id="btn-export-spdx" class="btn btn-secondary btn-sm">Download SPDX</button>
+              </div>
+              <div class="export-card">
+                <h3>OpenAPI 3.0 (Swagger) Schema Draft</h3>
+                <p>Standard OpenAPI 3.0.3 JSON schema inferred from observed API endpoints, parameters, and HTTP methods.</p>
+                <button id="btn-export-openapi" class="btn btn-secondary btn-sm">Download OpenAPI Spec</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 16. SETTINGS VIEW -->
+        <section id="view-settings" class="view-pane hidden">
+          <div class="panel">
+            <div class="panel-header">
+              <h2>Inspection Scope & Security Configuration</h2>
+            </div>
+            <div class="settings-group">
+              <label class="setting-item">
+                <input type="checkbox" id="setting-redaction" checked disabled>
+                <div>
+                  <strong>Mandatory Secret Redaction:</strong> Masks passwords, bearer tokens, JWT signatures, and private keys in all views and exports.
+                </div>
+              </label>
+              <label class="setting-item">
+                <input type="checkbox" id="setting-doh" checked>
+                <div>
+                  <strong>DNS-over-HTTPS (DoH):</strong> Use Cloudflare DoH endpoint for DNSSEC-verified queries without local resolver leaks.
+                </div>
+              </label>
+            </div>
+
+            <div class="panel-header" style="margin-top: 24px;">
+              <h2>Local Storage & Data Retention</h2>
+            </div>
+            <div class="settings-group">
+              <div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 12px;">
+                <div class="kpi-card">
+                  <div class="kpi-label">STORED SESSIONS</div>
+                  <div id="quota-sessions-count" class="kpi-value">0 / 10</div>
+                </div>
+                <div class="kpi-card">
+                  <div class="kpi-label">OBSERVATIONS</div>
+                  <div id="quota-obs-count" class="kpi-value">0 / 5000</div>
+                </div>
+                <div class="kpi-card">
+                  <div class="kpi-label">SAVED SNAPSHOTS</div>
+                  <div id="quota-snapshots-count" class="kpi-value">0 / 25</div>
+                </div>
+              </div>
+              <button id="btn-purge-storage" class="btn btn-danger btn-sm" style="background: #991b1b; border-color: #ef4444; color: #fff;">
+                🗑️ Purge All Stored ScopeLens Data
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div id="toast" class="toast hidden">Notice</div>
+
+  <script type="module" src="dashboard.js"></script>
+</body>
+</html>
