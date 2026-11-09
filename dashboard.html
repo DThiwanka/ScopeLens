@@ -252,6 +252,18 @@
             </div>
             <div id="dns-records-container"></div>
           </div>
+
+          <div class="panel" style="margin-top: 15px;">
+            <div class="panel-header">
+              <h2>Multi-Resolver DNS Propagation & DKIM Discovery</h2>
+              <div class="btn-group">
+                <button id="btn-run-multi-resolver" class="btn btn-secondary btn-xs">Compare Resolvers (Cloudflare / Google / Quad9)</button>
+                <button id="btn-probe-dkim" class="btn btn-secondary btn-xs">Discover DKIM Selectors</button>
+              </div>
+            </div>
+            <div id="multi-resolver-results" class="hidden" style="margin-top: 10px;"></div>
+            <div id="dkim-results-container" class="hidden" style="margin-top: 10px;"></div>
+          </div>
         </section>
 
         <!-- 5. NETWORK WATERFALL VIEW -->
@@ -273,6 +285,16 @@
 
           <div id="network-waterfall-container" class="network-stream">
             <div class="empty">Reload the page or click Start CDP Capture to monitor same-origin and third-party requests.</div>
+          </div>
+
+          <div class="panel" style="margin-top: 15px;">
+            <div class="panel-header">
+              <h2>WebSocket & Server-Sent Events (SSE) Streams</h2>
+              <span id="streams-count-badge" class="muted">0 streams</span>
+            </div>
+            <div id="streams-container">
+              <div class="empty">No active WebSocket upgrades or SSE streams observed.</div>
+            </div>
           </div>
         </section>
 
@@ -565,6 +587,44 @@
         </section>
       </div>
     </main>
+  </div>
+
+  <!-- Request Detail Drawer Modal -->
+  <div id="request-detail-drawer" class="drawer-modal hidden">
+    <div class="drawer-content">
+      <div class="drawer-header">
+        <div style="display: flex; align-items: center; gap: 8px; overflow: hidden;">
+          <span id="drawer-method-badge" class="badge-mini badge-neutral">GET</span>
+          <span id="drawer-status-pill" class="status-pill status-2xx">200</span>
+          <strong id="drawer-url" style="font-family: monospace; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></strong>
+        </div>
+        <div style="display: flex; gap: 8px; align-items: center; flex-shrink: 0;">
+          <button id="btn-copy-curl" class="btn btn-secondary btn-xs">Copy as cURL</button>
+          <button id="btn-close-drawer" class="btn btn-secondary btn-xs">&times; Close</button>
+        </div>
+      </div>
+      <div class="drawer-tabs">
+        <button class="drawer-tab-btn active" data-dtab="dtab-headers">Headers</button>
+        <button class="drawer-tab-btn" data-dtab="dtab-params">Query Params</button>
+        <button class="drawer-tab-btn" data-dtab="dtab-body">Payload</button>
+        <button class="drawer-tab-btn" data-dtab="dtab-response">Response</button>
+      </div>
+      <div id="dtab-headers" class="drawer-pane active">
+        <div class="drawer-section-title">REQUEST HEADERS</div>
+        <div id="drawer-req-headers" class="code-box"></div>
+        <div class="drawer-section-title" style="margin-top: 10px;">RESPONSE HEADERS</div>
+        <div id="drawer-res-headers" class="code-box"></div>
+      </div>
+      <div id="dtab-params" class="drawer-pane hidden">
+        <div id="drawer-params-table"></div>
+      </div>
+      <div id="dtab-body" class="drawer-pane hidden">
+        <div id="drawer-payload-box" class="code-box"></div>
+      </div>
+      <div id="dtab-response" class="drawer-pane hidden">
+        <div id="drawer-response-box" class="code-box"></div>
+      </div>
+    </div>
   </div>
 
   <div id="toast" class="toast hidden">Notice</div>
